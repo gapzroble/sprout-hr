@@ -1,4 +1,4 @@
-package endpoints
+package handler
 
 import (
 	"strings"
@@ -27,7 +27,7 @@ func NewLink(params ...string) *Link {
 	}
 
 	if len(params) > 2 {
-        link = &(params[2])
+		link = &(params[2])
 	}
 
 	return &Link{

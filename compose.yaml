@@ -1,6 +1,14 @@
-#version: '3'
+# version: '3'
 
 services: 
+
+  mongodb:
+    image: mongo:6-jammy
+    container_name: mongodb
+    ports:
+      - "27017:27017"
+    networks:
+      - go-network
 
   app:
     build: 
@@ -8,8 +16,13 @@ services:
     container_name: go-app
     environment:
       APIKEY: "${APIKEY}"
+      USERNAME: "${USERNAME}"
+      PASSWORD: "${PASSWORD}"
+      MONGODB_URL: mongodb://mongodb:27017/sprout-dtr
     networks: 
       - go-network
+    depends_on:
+      - mongodb
 
   nginx:
     build: 

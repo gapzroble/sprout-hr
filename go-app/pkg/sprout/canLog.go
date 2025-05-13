@@ -1,5 +1,9 @@
 package sprout
 
+import (
+	"log"
+)
+
 // after 8am
 func CanLogin() bool {
 	return Now(true).Hour() >= 8
@@ -9,12 +13,7 @@ func CanLogin() bool {
 func CanLogout() bool {
 	now := Now(true)
 
-	logger.Info(&logger.LogEntry{
-		Message: "Now",
-		Keys: map[string]interface{}{
-			"now": now,
-		},
-	})
+	log.Println("Now", now)
 
 	if now.Hour() < 22 {
 		return false

@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/gapzroble/mygarminhttpclient/pkg/sprout"
+	"github.com/gapzroble/sprout-hr/pkg/sprout"
 )
 
 func TestGetToken(t *testing.T) {

@@ -2,17 +2,15 @@ FROM golang:1.23.6 AS builder
 
 WORKDIR /app
 
-COPY /cmd/main.go ./cmd/
+COPY . ./
 
-RUN go mod init go-app
-
-RUN CGO_ENABLED=0 GOOS=linux go build -o /go-app ./cmd/main.go
+RUN make build
 
 FROM scratch
 
 WORKDIR /
 
-COPY --from=builder /go-app .
+COPY --from=builder /app/go-app .
 
 EXPOSE 3000
 

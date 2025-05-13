@@ -4,16 +4,12 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"net/url"
 	"os"
 	"strings"
 	"time"
-
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/aws/aws-sdk-go/service/dynamodb"
-	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbattribute"
 )
 
 func logout(token string) (string, error) {
@@ -36,12 +32,7 @@ func logout(token string) (string, error) {
 	}
 
 	responseBody, _ := io.ReadAll(response.Body)
-	logger.Info(&logger.LogEntry{
-		Message: "Response",
-		Keys: map[string]interface{}{
-			"response": string(responseBody),
-		},
-	})
+	log.Println("Response", responseBody)
 
 	if response.StatusCode > 299 {
 		return fmt.Sprintf("%d error", response.StatusCode), fmt.Errorf("expecting 2xx response , got %d", response.StatusCode)
@@ -64,42 +55,42 @@ func Logout(ctx context.Context, timeIn *time.Time, token string) (string, error
 	if err != nil {
 		return "Logout failed", err
 	}
-	now := Now()
-	dtr := DTR{
-		Date: now.Format("2006-01-02"),
-		In:   timeIn,
-		Out:  &now,
-		TTL:  now.AddDate(0, 2, 0).Unix(),
-	}
+	// now := Now()
+	// dtr := DTR{
+	// 	Date: now.Format("2006-01-02"),
+	// 	In:   timeIn,
+	// 	Out:  &now,
+	// 	TTL:  now.AddDate(0, 2, 0).Unix(),
+	// }
 
-	av, err := dynamodbattribute.MarshalMap(dtr)
-	if err != nil {
-		logger.Error(&logger.LogEntry{
-			Message:      "Failed to marshalmap dynamodb attribute",
-			ErrorMessage: err.Error(),
-		})
-		return "Marshalmap faield", err
-	}
+	// av, err := dynamodbattribute.MarshalMap(dtr)
+	// if err != nil {
+	// 	logger.Error(&logger.LogEntry{
+	// 		Message:      "Failed to marshalmap dynamodb attribute",
+	// 		ErrorMessage: err.Error(),
+	// 	})
+	// 	return "Marshalmap faield", err
+	// }
 
-	input := &dynamodb.PutItemInput{
-		Item:      av,
-		TableName: aws.String(os.Getenv("TABLE_NAME")),
-	}
+	// input := &dynamodb.PutItemInput{
+	// 	Item:      av,
+	// 	TableName: aws.String(os.Getenv("TABLE_NAME")),
+	// }
 
-	sess := session.Must(session.NewSession())
-	svc := dynamodb.New(sess)
+	// sess := session.Must(session.NewSession())
+	// svc := dynamodb.New(sess)
 
-	_, err = svc.PutItemWithContext(ctx, input)
-	if err != nil {
-		logger.Warn(&logger.LogEntry{
-			Message:      "Failed to save dtr record",
-			ErrorMessage: err.Error(),
-			Keys: map[string]interface{}{
-				"item": dtr,
-			},
-		})
-		return "Save dtr failed", err
-	}
+	// _, err = svc.PutItemWithContext(ctx, input)
+	// if err != nil {
+	// 	logger.Warn(&logger.LogEntry{
+	// 		Message:      "Failed to save dtr record",
+	// 		ErrorMessage: err.Error(),
+	// 		Keys: map[string]interface{}{
+	// 			"item": dtr,
+	// 		},
+	// 	})
+	// 	return "Save dtr failed", err
+	// }
 
 	return message, nil
 }
