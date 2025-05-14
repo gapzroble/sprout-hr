@@ -64,7 +64,7 @@ func IsHoliday(ctx context.Context, client *mongo.Client) (string, bool) {
 	date := Now().Format("2006-01-02")
 	filter := bson.D{bson.E{Key: "date", Value: date}}
 
-	log.WithField("date", date).Println("Finding dtr")
+	log.WithField("date", date).Println("Is holiday?")
 
 	result := struct {
 		Date string
@@ -73,7 +73,7 @@ func IsHoliday(ctx context.Context, client *mongo.Client) (string, bool) {
 
 	err := collection.FindOne(ctx, filter).Decode(&result)
 	if err != nil {
-		log.WithError(err).Warn("Error finding holiday")
+		log.WithError(err).Warn("Error checking holiday")
 		return "", false
 	}
 
