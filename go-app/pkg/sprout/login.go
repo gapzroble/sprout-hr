@@ -59,6 +59,8 @@ func Login(ctx context.Context, client *mongo.Client, token string) (string, err
 		return "Login failed", err
 	}
 
+	log.Println("Saving DTR..")
+
 	now := Now()
 	dtr := bson.M{
 		"date": now.Format("2006-01-02"),
@@ -68,10 +70,11 @@ func Login(ctx context.Context, client *mongo.Client, token string) (string, err
 
 	collection := client.Database(databaseName).Collection(collectionName)
 
-	_, err = collection.InsertOne(ctx, dtr)
+	result, err := collection.InsertOne(ctx, dtr)
 	if err != nil {
 		return "Save dtr faield", err
 	}
+	log.WithField("insertedId", result.InsertedID).Println("result")
 
 	return message, nil
 }

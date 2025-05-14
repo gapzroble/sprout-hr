@@ -7,15 +7,31 @@ import (
 	log "github.com/sirupsen/logrus"
 
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
 type DTR struct {
-	Date string // key
+	ID   primitive.ObjectID `bson:"_id,omitempty"`
+	Date string
 	In   *time.Time
 	Out  *time.Time
 
 	TTL int64 // TODO
+}
+
+func (d DTR) toLocalTime() DTR {
+	if d.In != nil {
+		in := d.In.In(pht)
+		d.In = &in
+	}
+
+	if d.Out != nil {
+		out := d.Out.In(pht)
+		d.Out = &out
+	}
+
+	return d
 }
 
 var (
@@ -24,7 +40,7 @@ var (
 	holidayCollectionName = "holidays"
 )
 
-func GetDTR(ctx context.Context, client *mongo.Client) (*time.Time, *time.Time) {
+func GetDTR(ctx context.Context, client *mongo.Client) *DTR {
 	var result DTR
 
 	collection := client.Database(databaseName).Collection(collectionName)
@@ -37,17 +53,7 @@ func GetDTR(ctx context.Context, client *mongo.Client) (*time.Time, *time.Time) 
 	err := collection.FindOne(ctx, filter).Decode(&result)
 	if err != nil {
 		log.WithError(err).Warn("Error finding dtr")
-		return nil, nil
-	}
-
-	if result.In != nil {
-		in := result.In.In(pht)
-		result.In = &in
-	}
-
-	if result.Out != nil {
-		out := result.Out.In(pht)
-		result.Out = &out
+		return nil
 	}
 
 	log.WithFields(log.Fields{
@@ -55,7 +61,9 @@ func GetDTR(ctx context.Context, client *mongo.Client) (*time.Time, *time.Time) 
 		"out": result.Out,
 	}).Println("DTR result")
 
-	return result.In, result.Out
+	dtr := result.toLocalTime()
+
+	return &dtr
 }
 
 func IsHoliday(ctx context.Context, client *mongo.Client) (string, bool) {

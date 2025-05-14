@@ -40,20 +40,26 @@ func getLink(ctx context.Context) (link *Link) {
 		return
 	}
 
-	timeIn, timeOut := sprout.GetDTR(ctx, client)
-	if timeIn != nil {
-		link.AddChild(NewLink("logged_in", fmt.Sprintf("Logged in (%s)", timeIn.Format("03:04pm"))))
-	} else {
+	dtr := sprout.GetDTR(ctx, client)
+	if dtr == nil {
 		link.AddChild(NewLink("login", "Login", "/login"))
-	}
-
-	if timeIn == nil {
 		link.AddChild(NewLink("no_logout", "Logout"))
 		return
 	}
 
-	if timeOut != nil {
-		link.AddChild(NewLink("logged_out", fmt.Sprintf("Logged out (%s)", timeOut.Format("03:04pm"))))
+	if dtr.In != nil {
+		link.AddChild(NewLink("logged_in", fmt.Sprintf("Logged in (%s)", dtr.In.Format("03:04pm"))))
+	} else {
+		link.AddChild(NewLink("login", "Login", "/login"))
+	}
+
+	if dtr.In == nil {
+		link.AddChild(NewLink("no_logout", "Logout"))
+		return
+	}
+
+	if dtr.Out != nil {
+		link.AddChild(NewLink("logged_out", fmt.Sprintf("Logged out (%s)", dtr.Out.Format("03:04pm"))))
 		return
 	}
 

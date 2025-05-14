@@ -3,7 +3,6 @@ package handler
 import (
 	"net/http"
 	"sync"
-	"time"
 
 	"github.com/gapzroble/sprout-hr/pkg/sprout"
 	log "github.com/sirupsen/logrus"
@@ -32,29 +31,32 @@ func Logout(w http.ResponseWriter, r *http.Request) {
 		}
 	}()
 
-	var timeIn *time.Time
-	var timeOut *time.Time
+	var dtr *sprout.DTR
+
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		timeIn, timeOut = sprout.GetDTR(ctx, client)
+		dtr = sprout.GetDTR(ctx, client)
+		if dtr == nil {
+			dtr = &sprout.DTR{} // zero value
+		}
 	}()
 
 	wg.Wait()
 
-	if timeOut != nil {
+	if dtr.Out != nil {
 		w.Write([]byte("Already logged out"))
 		return
 	}
 
-	if timeIn == nil {
+	if dtr.In == nil {
 		w.Write([]byte("Not logged in"))
 		return
 	}
 
 	log.Println("Logging out..")
 
-	message, err := sprout.Logout(ctx, client, timeIn, token)
+	message, err := sprout.Logout(ctx, client, dtr, token)
 	if err != nil {
 		log.WithError(err).Error("Failed to logout")
 		w.Write([]byte(err.Error()))

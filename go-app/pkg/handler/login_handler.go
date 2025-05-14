@@ -36,7 +36,9 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		timeIn, _ = sprout.GetDTR(ctx, client)
+		if dtr := sprout.GetDTR(ctx, client); dtr != nil {
+			timeIn = dtr.In
+		}
 	}()
 
 	wg.Wait()

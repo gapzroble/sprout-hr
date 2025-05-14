@@ -8,12 +8,12 @@ import (
 	"net/url"
 	"os"
 	"strings"
-	"time"
 
 	log "github.com/sirupsen/logrus"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 func logout(token string) (string, error) {
@@ -54,26 +54,26 @@ func logout(token string) (string, error) {
 	return res.Message, nil
 }
 
-func Logout(ctx context.Context, client *mongo.Client, timeIn *time.Time, token string) (string, error) {
-	message, err := logout(token)
-	if err != nil {
-		return "Logout failed", err
-	}
+func Logout(ctx context.Context, client *mongo.Client, dtr *DTR, token string) (string, error) {
+	message := "logged out" // already logged-out, still testing
+	// message, err := logout(token)
+	// if err != nil {
+	// 	return "Logout failed", err
+	// }
 
-	now := Now()
-	dtr := bson.M{
-		"date": now.Format("2006-01-02"),
-		"in":   &now,
-		"out":  &now,
-		"ttl":  now.AddDate(0, 2, 0).Unix(),
-	}
+	log.Println("Saving DTR..")
 
 	collection := client.Database(databaseName).Collection(collectionName)
 
-	_, err = collection.InsertOne(ctx, dtr)
+	opts := options.Update().SetUpsert(true)
+	filter := bson.D{bson.E{Key: "_id", Value: dtr.ID}}
+	update := bson.D{bson.E{Key: "$set", Value: bson.D{bson.E{Key: "out", Value: Now()}}}}
+
+	result, err := collection.UpdateOne(ctx, filter, update, opts)
 	if err != nil {
-		return "Save dtr faield", err
+		return "Update dtr faield", err
 	}
+	log.WithField("updated", result).Println("result")
 
 	return message, nil
 }
