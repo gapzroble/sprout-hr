@@ -1,6 +1,8 @@
 package main
 
 import (
+	"crypto/sha256"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -19,6 +21,11 @@ func init() {
 		apikey = time.Now().String()
 	}
 	log.Println("apikey", apikey)
+
+	h := sha256.New()
+	h.Write([]byte(apikey))
+	bs := h.Sum(nil)
+	apikey = fmt.Sprintf("%x\n", bs)
 }
 
 func main() {
