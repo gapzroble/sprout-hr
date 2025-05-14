@@ -55,11 +55,10 @@ func logout(token string) (string, error) {
 }
 
 func Logout(ctx context.Context, client *mongo.Client, dtr *DTR, token string) (string, error) {
-	message := "logged out" // already logged-out, still testing
-	// message, err := logout(token)
-	// if err != nil {
-	// 	return "Logout failed", err
-	// }
+	message, err := logout(token)
+	if err != nil {
+		return "Logout failed", err
+	}
 
 	log.Println("Saving DTR..")
 
@@ -71,9 +70,9 @@ func Logout(ctx context.Context, client *mongo.Client, dtr *DTR, token string) (
 
 	result, err := collection.UpdateOne(ctx, filter, update, opts)
 	if err != nil {
-		return "Update dtr faield", err
+		return "Update dtr failed", err
 	}
-	log.WithField("updated", result).Println("result")
+	log.WithField("result", fmt.Sprintf("%v", result)).Println("result")
 
 	return message, nil
 }
