@@ -56,12 +56,12 @@ func GetDTR(ctx context.Context, client *mongo.Client) *DTR {
 		return nil
 	}
 
-	log.WithFields(log.Fields{
-		"in":  result.In,
-		"out": result.Out,
-	}).Println("DTR result")
-
 	dtr := result.toLocalTime()
+
+	log.WithFields(log.Fields{
+		"in":  dtr.In,
+		"out": dtr.Out,
+	}).Println("DTR result")
 
 	return &dtr
 }
