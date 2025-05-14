@@ -44,7 +44,7 @@ func getLink(ctx context.Context, apikey string) (link *Link) {
 	if timeIn != nil {
 		link.AddChild(NewLink("logged_in", fmt.Sprintf("Logged in (%s)", timeIn.Format("03:04pm"))))
 	} else {
-		link.AddChild(NewLink("login", "Login", fmt.Sprintf("/login?apikey=%s", apikey)))
+		link.AddChild(NewLink("login", "Login", "/login"))
 	}
 
 	if timeIn == nil {
@@ -62,7 +62,7 @@ func getLink(ctx context.Context, apikey string) (link *Link) {
 		return
 	}
 
-	link.PrependChild(NewLink("logout", "Logout", fmt.Sprintf("/logout?apikey=%s", apikey)))
+	link.PrependChild(NewLink("logout", "Logout", "/logout"))
 
 	return
 }
