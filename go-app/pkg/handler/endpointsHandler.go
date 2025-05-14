@@ -12,13 +12,13 @@ import (
 func Endpoints(w http.ResponseWriter, r *http.Request) {
 	defer handlePanic()
 
-	link := getLink(r.Context(), r.URL.Query().Get("apikey"))
+	link := getLink(r.Context())
 	links := link.Build(1)
 
 	w.Write([]byte(links))
 }
 
-func getLink(ctx context.Context, apikey string) (link *Link) {
+func getLink(ctx context.Context) (link *Link) {
 	link = NewLink("sprout", "Sprout")
 
 	if isWeekend() {
