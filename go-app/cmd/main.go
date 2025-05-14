@@ -50,7 +50,7 @@ func authorized(next http.HandlerFunc) http.HandlerFunc {
 		log.WithField("path", r.URL.Path).Println("Request START:")
 		defer log.Println("Request END")
 
-		header := r.Header.Get("X-API-KEY")
+		header := r.Header.Get("Authorization")
 		if header != apikey {
 			for key, value := range r.Header {
 				log.WithField(key, value).Println("header")
