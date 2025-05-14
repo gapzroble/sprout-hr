@@ -46,8 +46,8 @@ func main() {
 func authorized(next http.HandlerFunc) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		log.Println("---------------------------------------------------------------------------------")
-		log.Printf("Request start: %s\n", r.URL.Path)
-		defer log.Printf("Request end: %s\n", r.URL.Path)
+		log.WithField("path", r.URL.Path).Println("Request START:")
+		defer log.Println("Request END")
 
 		if r.URL.Query().Get("apikey") != apikey {
 			log.Warn("Wrong/no apikey")
