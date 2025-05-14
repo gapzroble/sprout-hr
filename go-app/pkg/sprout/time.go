@@ -3,6 +3,8 @@ package sprout
 import (
 	"log"
 	"time"
+
+	_ "time/tzdata"
 )
 
 var (
