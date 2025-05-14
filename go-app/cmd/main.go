@@ -43,8 +43,8 @@ func main() {
 
 func authorized(next http.HandlerFunc) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		log.Printf("Request start: %s\n", r.URL.Path)
-		defer log.Printf("Request end: %s\n", r.URL.Path)
+		log.Printf("Request start: %s ---------------------------\n", r.URL.Path)
+		defer log.Printf("Request end: %s -----------------------------\n", r.URL.Path)
 
 		if r.URL.Query().Get("apikey") != apikey {
 			response := "404 page not found"
