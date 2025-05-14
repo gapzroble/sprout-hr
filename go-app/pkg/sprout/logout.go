@@ -10,6 +10,9 @@ import (
 	"os"
 	"strings"
 	"time"
+
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 func logout(token string) (string, error) {
@@ -50,47 +53,26 @@ func logout(token string) (string, error) {
 	return res.Message, nil
 }
 
-func Logout(ctx context.Context, timeIn *time.Time, token string) (string, error) {
+func Logout(client *mongo.Client, timeIn *time.Time, token string) (string, error) {
 	message, err := logout(token)
 	if err != nil {
 		return "Logout failed", err
 	}
-	// now := Now()
-	// dtr := DTR{
-	// 	Date: now.Format("2006-01-02"),
-	// 	In:   timeIn,
-	// 	Out:  &now,
-	// 	TTL:  now.AddDate(0, 2, 0).Unix(),
-	// }
 
-	// av, err := dynamodbattribute.MarshalMap(dtr)
-	// if err != nil {
-	// 	logger.Error(&logger.LogEntry{
-	// 		Message:      "Failed to marshalmap dynamodb attribute",
-	// 		ErrorMessage: err.Error(),
-	// 	})
-	// 	return "Marshalmap faield", err
-	// }
+	now := Now()
+	dtr := bson.M{
+		"date": now.Format("2006-01-02"),
+		"in":   &now,
+		"out":  &now,
+		"ttl":  now.AddDate(0, 2, 0).Unix(),
+	}
 
-	// input := &dynamodb.PutItemInput{
-	// 	Item:      av,
-	// 	TableName: aws.String(os.Getenv("TABLE_NAME")),
-	// }
+	collection := client.Database(databaseName).Collection(collectionName)
 
-	// sess := session.Must(session.NewSession())
-	// svc := dynamodb.New(sess)
-
-	// _, err = svc.PutItemWithContext(ctx, input)
-	// if err != nil {
-	// 	logger.Warn(&logger.LogEntry{
-	// 		Message:      "Failed to save dtr record",
-	// 		ErrorMessage: err.Error(),
-	// 		Keys: map[string]interface{}{
-	// 			"item": dtr,
-	// 		},
-	// 	})
-	// 	return "Save dtr failed", err
-	// }
+	_, err = collection.InsertOne(context.Background(), dtr)
+	if err != nil {
+		return "Save dtr faield", err
+	}
 
 	return message, nil
 }

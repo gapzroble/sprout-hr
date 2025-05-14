@@ -1,7 +1,12 @@
 package sprout
 
 import (
+	"context"
+	"log"
 	"time"
+
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 type DTR struct {
@@ -12,41 +17,38 @@ type DTR struct {
 	TTL int64
 }
 
-func GetDTR() (*time.Time, *time.Time) {
-	return nil, nil
-	// date := Now().Format("2006-01-02")
-	// input := &dynamodb.GetItemInput{
-	// 	TableName: aws.String(os.Getenv("TABLE_NAME")),
-	// 	Key: map[string]*dynamodb.AttributeValue{
-	// 		"Date": {
-	// 			S: aws.String(date),
-	// 		},
-	// 	},
-	// 	ConsistentRead: aws.Bool(true),
-	// }
-	// logger.InfoString("Find existing dtr")
+var (
+	databaseName   = "sprout-hr"
+	collectionName = "dtr"
+)
 
-	// sess := session.Must(session.NewSession())
-	// svc := dynamodb.New(sess)
+func GetDTR(client *mongo.Client) (*time.Time, *time.Time) {
+	var result DTR
 
-	// result, err := svc.GetItemWithContext(ctx, input)
-	// if err != nil {
-	// 	logger.Error(&logger.LogEntry{
-	// 		Message:      "Failed to get dtr",
-	// 		ErrorMessage: err.Error(),
-	// 	})
-	// 	return nil, nil
-	// }
+	collection := client.Database(databaseName).Collection(collectionName)
 
-	// var rec DTR
-	// if err := dynamodbattribute.UnmarshalMap(result.Item, &rec); err != nil {
-	// 	logger.Error(&logger.LogEntry{
-	// 		Message:      "Failed to unmarshalmap",
-	// 		ErrorMessage: err.Error(),
-	// 	})
+	date := Now().Format("2006-01-02")
+	filter := bson.D{bson.E{Key: "date", Value: date}}
 
-	// 	return nil, nil
-	// }
+	log.Println("Finding dtr", filter)
 
-	// return rec.In, rec.Out
+	err := collection.FindOne(context.Background(), filter).Decode(&result)
+	if err != nil {
+		log.Println("Error finding dtr", err)
+		return nil, nil
+	}
+
+	if result.In != nil {
+		in := result.In.In(pht)
+		result.In = &in
+	}
+
+	if result.Out != nil {
+		out := result.Out.In(pht)
+		result.Out = &out
+	}
+
+	log.Println("DTR result", result)
+
+	return result.In, result.Out
 }

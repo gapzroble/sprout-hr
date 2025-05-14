@@ -35,7 +35,7 @@ func getLink(apikey string) (link *Link) {
 		return
 	}
 
-	timeIn, timeOut := sprout.GetDTR()
+	timeIn, timeOut := sprout.GetDTR(client)
 	if timeIn != nil {
 		link.AddChild(NewLink("logged_in", fmt.Sprintf("Logged in (%s)", timeIn.Format("03:04pm"))))
 	} else {

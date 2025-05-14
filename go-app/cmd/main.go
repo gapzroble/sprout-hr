@@ -22,11 +22,15 @@ func init() {
 }
 
 func main() {
-	handler.Init(os.Getenv("MONGODB_URL"))
+	if err := handler.ConnectMongoDb(os.Getenv("MONGODB_URL")); err != nil {
+		log.Panicln("Failed to connect to mongodb", err)
+		return
+	}
 
 	http.HandleFunc("/endpoints", authorized(handler.Endpoints))
 	http.HandleFunc("/login", authorized(handler.Login))
 	http.HandleFunc("/logout", authorized(handler.Logout))
+
 	log.Fatal(http.ListenAndServe(":3000", nil))
 }
 
