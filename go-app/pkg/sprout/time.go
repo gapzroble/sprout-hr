@@ -23,9 +23,10 @@ func init() {
 	time.Local = pht
 }
 
-func Now(adjust ...bool) time.Time {
+func Now() time.Time {
 	now := time.Now().In(pht)
-	if len(adjust) > 0 && adjust[0] && now.Hour() < 6 { // adjust if now 12am - 6am
+	// adjust if now 12am - 6am
+	if now.Hour() >= 0 && now.Hour() <= 6 {
 		adj := time.Date(now.Year(), now.Month(), now.Day()-1, 23, 59, 59, 0, pht)
 		log.WithFields(log.Fields{
 			"orig":     now,

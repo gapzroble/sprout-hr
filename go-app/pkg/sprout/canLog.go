@@ -6,7 +6,7 @@ import (
 
 // CanLogin after 8am
 func CanLogin() (result bool) {
-	now := Now(true)
+	now := Now()
 	defer func() {
 		log.WithFields(log.Fields{
 			"now":    now,
@@ -21,7 +21,7 @@ func CanLogin() (result bool) {
 
 // CanLogout after 10:30pm
 func CanLogout() (result bool) {
-	now := Now(true)
+	now := Now()
 
 	defer func() {
 		log.WithFields(log.Fields{
