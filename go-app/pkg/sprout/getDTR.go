@@ -31,7 +31,7 @@ func GetDTR(client *mongo.Client) (*time.Time, *time.Time) {
 	date := Now().Format("2006-01-02")
 	filter := bson.D{bson.E{Key: "date", Value: date}}
 
-	log.Println("Finding dtr", filter)
+	log.WithField("date", date).Println("Finding dtr")
 
 	err := collection.FindOne(context.Background(), filter).Decode(&result)
 	if err != nil {
@@ -49,7 +49,10 @@ func GetDTR(client *mongo.Client) (*time.Time, *time.Time) {
 		result.Out = &out
 	}
 
-	log.Printf("DTR result (in: %v, out: %v)", result.In, result.Out)
+	log.WithFields(log.Fields{
+		"in":  result.In,
+		"out": result.Out,
+	}).Println("DTR result")
 
 	return result.In, result.Out
 }

@@ -27,7 +27,10 @@ func Now(adjust ...bool) time.Time {
 	now := time.Now().In(pht)
 	if len(adjust) > 0 && adjust[0] && now.Hour() < 6 { // adjust if now 12am - 6am
 		adj := time.Date(now.Year(), now.Month(), now.Day()-1, 23, 59, 59, 0, pht)
-		log.Println("Orig Now", now, "Adjusted Now", adj)
+		log.WithFields(log.Fields{
+			"orig":     now,
+			"adjusted": adj,
+		}).Println("Now")
 		return adj
 	}
 	return now // no adjustment

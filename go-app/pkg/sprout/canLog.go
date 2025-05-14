@@ -4,20 +4,38 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-// after 8am
-func CanLogin() bool {
-	return Now(true).Hour() >= 8
+// CanLogin after 8am
+func CanLogin() (result bool) {
+	now := Now(true)
+	defer func() {
+		log.WithFields(log.Fields{
+			"now":    now,
+			"hour":   now.Hour(),
+			"result": result,
+		}).Println("Can login?")
+	}()
+
+	result = now.Hour() >= 8
+	return
 }
 
-// after 10:30pm
-func CanLogout() bool {
+// CanLogout after 10:30pm
+func CanLogout() (result bool) {
 	now := Now(true)
 
-	log.Println("Now", now)
+	defer func() {
+		log.WithFields(log.Fields{
+			"now":    now,
+			"hour":   now.Hour(),
+			"result": result,
+		}).Println("Can logout?")
+	}()
 
 	if now.Hour() < 22 {
-		return false
+		result = false
+		return
 	}
 
-	return now.Hour() >= 22 || now.Hour() < 4 // 4am, won't happen
+	result = now.Hour() >= 22 || now.Hour() < 4 // 4am, won't happen
+	return
 }
