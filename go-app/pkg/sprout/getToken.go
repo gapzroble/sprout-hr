@@ -3,7 +3,7 @@ package sprout
 import (
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 	"strings"
@@ -15,13 +15,15 @@ const (
 )
 
 func GetRequestVerificationToken() (string, error) {
+	log.Println("Getting requestion verification token ..")
+
 	response, err := http.Get(endpoint)
 	if err != nil {
-		log.Panicln("Failed to get token", err)
+		log.Println("Failed to get token", err)
 		return "", err
 	}
 
-	responseBody, err := ioutil.ReadAll(response.Body)
+	responseBody, err := io.ReadAll(response.Body)
 	if err != nil {
 		log.Println("Failed to read response", err)
 		return "", err

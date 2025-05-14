@@ -1,4 +1,4 @@
-# version: '3'
+version: '3'
 
 services: 
 
@@ -18,11 +18,12 @@ services:
       APIKEY: "${APIKEY}"
       USERNAME: "${USERNAME}"
       PASSWORD: "${PASSWORD}"
-      MONGODB_URL: mongodb://mongodb:27017/sprout-dtr
+      MONGODB_URL: mongodb://mongodb:27017
     networks: 
       - go-network
     depends_on:
       - mongodb
+    restart: on-failure
 
   nginx:
     build: 
