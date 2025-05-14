@@ -40,8 +40,8 @@ func authorized(next http.HandlerFunc) http.HandlerFunc {
 		defer log.Printf("Request end: %s\n", r.URL.Path)
 
 		if r.URL.Query().Get("apikey") != apikey {
-			response := "Incorrect or no apikey"
-			w.WriteHeader(401)
+			response := "404 page not found"
+			w.WriteHeader(404)
 			w.Write([]byte(response))
 			return
 		}
