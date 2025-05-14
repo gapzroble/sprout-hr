@@ -25,7 +25,7 @@ func init() {
 	h := sha256.New()
 	h.Write([]byte(apikey))
 	bs := h.Sum(nil)
-	apikey = fmt.Sprintf("%x\n", bs)
+	apikey = fmt.Sprintf("%x", bs)
 }
 
 func main() {
