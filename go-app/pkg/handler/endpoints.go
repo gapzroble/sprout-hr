@@ -25,8 +25,12 @@ func getLink(apikey string) (link *Link) {
 		return
 	}
 
-	if isHoliday() {
-		link.AddChild(NewLink("holiday", "Rest Day (Holiday)"))
+	if name, yes := sprout.IsHoliday(client); yes {
+		holiday := "Rest Day (Holiday)"
+		if name != "" {
+			holiday = name
+		}
+		link.AddChild(NewLink("holiday", holiday))
 		return
 	}
 

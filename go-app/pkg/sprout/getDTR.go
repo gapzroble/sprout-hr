@@ -15,12 +15,13 @@ type DTR struct {
 	In   *time.Time
 	Out  *time.Time
 
-	TTL int64
+	TTL int64 // TODO
 }
 
 var (
-	databaseName   = "sprout-hr"
-	collectionName = "dtr"
+	databaseName          = "sprout-hr"
+	collectionName        = "dtr"
+	holidayCollectionName = "holidays"
 )
 
 func GetDTR(client *mongo.Client) (*time.Time, *time.Time) {
@@ -55,4 +56,26 @@ func GetDTR(client *mongo.Client) (*time.Time, *time.Time) {
 	}).Println("DTR result")
 
 	return result.In, result.Out
+}
+
+func IsHoliday(client *mongo.Client) (string, bool) {
+	collection := client.Database(databaseName).Collection(holidayCollectionName)
+
+	date := Now().Format("2006-01-02")
+	filter := bson.D{bson.E{Key: "date", Value: date}}
+
+	log.WithField("date", date).Println("Finding dtr")
+
+	result := struct {
+		Date string
+		Name string
+	}{}
+
+	err := collection.FindOne(context.Background(), filter).Decode(&result)
+	if err != nil {
+		log.WithError(err).Warn("Error finding holiday")
+		return "", false
+	}
+
+	return result.Name, true
 }

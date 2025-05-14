@@ -13,7 +13,3 @@ func isWeekend() bool {
 	}
 	return false
 }
-
-func isHoliday() bool {
-	return false
-}
