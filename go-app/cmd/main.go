@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/gapzroble/sprout-hr/pkg/handler"
+	_ "github.com/gapzroble/sprout-hr/pkg/sprout"
 	log "github.com/sirupsen/logrus"
 )
 

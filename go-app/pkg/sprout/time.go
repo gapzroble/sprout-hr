@@ -20,6 +20,7 @@ func init() {
 		pht = time.Local
 		log.WithError(err).Warn("Failed to load timezone")
 	}
+	time.Local = pht
 }
 
 func Now(adjust ...bool) time.Time {
