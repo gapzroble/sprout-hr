@@ -53,7 +53,7 @@ func login(token string) (string, error) {
 	return res.Message, nil
 }
 
-func Login(client *mongo.Client, token string) (string, error) {
+func Login(ctx context.Context, client *mongo.Client, token string) (string, error) {
 	message, err := login(token)
 	if err != nil {
 		return "Login failed", err
@@ -68,7 +68,7 @@ func Login(client *mongo.Client, token string) (string, error) {
 
 	collection := client.Database(databaseName).Collection(collectionName)
 
-	_, err = collection.InsertOne(context.Background(), dtr)
+	_, err = collection.InsertOne(ctx, dtr)
 	if err != nil {
 		return "Save dtr faield", err
 	}

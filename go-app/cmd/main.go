@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"crypto/sha256"
 	"fmt"
 	"net/http"
@@ -32,19 +33,22 @@ func init() {
 }
 
 func main() {
-	if err := handler.ConnectMongoDb(os.Getenv("MONGODB_URL")); err != nil {
+	ctx := context.Background()
+
+	if err := handler.ConnectMongoDb(ctx, os.Getenv("MONGODB_URL")); err != nil {
 		log.Panicln("Failed to connect to mongodb", err)
 		return
 	}
+	defer handler.DisconnectMongoDb(ctx)
 
-	http.HandleFunc("/endpoints", authorized(handler.Endpoints))
-	http.HandleFunc("/login", authorized(handler.Login))
-	http.HandleFunc("/logout", authorized(handler.Logout))
+	http.HandleFunc("/endpoints", authorized(ctx, handler.Endpoints))
+	http.HandleFunc("/login", authorized(ctx, handler.Login))
+	http.HandleFunc("/logout", authorized(ctx, handler.Logout))
 
 	log.Fatal(http.ListenAndServe(":3000", nil))
 }
 
-func authorized(next http.HandlerFunc) http.HandlerFunc {
+func authorized(ctx context.Context, next http.HandlerFunc) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		log.Println("---------------------------------------------------------------------------------")
 		log.WithField("path", r.URL.Path).Println("Request START:")
@@ -62,6 +66,9 @@ func authorized(next http.HandlerFunc) http.HandlerFunc {
 			return
 		}
 
-		next.ServeHTTP(w, r)
+		rctx, cancel := context.WithTimeout(ctx, 30*time.Second)
+		defer cancel()
+
+		next.ServeHTTP(w, r.WithContext(rctx))
 	})
 }

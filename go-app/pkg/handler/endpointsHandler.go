@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 
@@ -11,13 +12,13 @@ import (
 func Endpoints(w http.ResponseWriter, r *http.Request) {
 	defer handlePanic()
 
-	link := getLink(r.URL.Query().Get("apikey"))
+	link := getLink(r.Context(), r.URL.Query().Get("apikey"))
 	links := link.Build(1)
 
 	w.Write([]byte(links))
 }
 
-func getLink(apikey string) (link *Link) {
+func getLink(ctx context.Context, apikey string) (link *Link) {
 	link = NewLink("sprout", "Sprout")
 
 	if isWeekend() {
@@ -25,7 +26,7 @@ func getLink(apikey string) (link *Link) {
 		return
 	}
 
-	if name, yes := sprout.IsHoliday(client); yes {
+	if name, yes := sprout.IsHoliday(ctx, client); yes {
 		holiday := "Rest Day (Holiday)"
 		if name != "" {
 			holiday = name
@@ -39,7 +40,7 @@ func getLink(apikey string) (link *Link) {
 		return
 	}
 
-	timeIn, timeOut := sprout.GetDTR(client)
+	timeIn, timeOut := sprout.GetDTR(ctx, client)
 	if timeIn != nil {
 		link.AddChild(NewLink("logged_in", fmt.Sprintf("Logged in (%s)", timeIn.Format("03:04pm"))))
 	} else {

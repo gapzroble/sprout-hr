@@ -24,7 +24,7 @@ var (
 	holidayCollectionName = "holidays"
 )
 
-func GetDTR(client *mongo.Client) (*time.Time, *time.Time) {
+func GetDTR(ctx context.Context, client *mongo.Client) (*time.Time, *time.Time) {
 	var result DTR
 
 	collection := client.Database(databaseName).Collection(collectionName)
@@ -34,7 +34,7 @@ func GetDTR(client *mongo.Client) (*time.Time, *time.Time) {
 
 	log.WithField("date", date).Println("Finding dtr")
 
-	err := collection.FindOne(context.Background(), filter).Decode(&result)
+	err := collection.FindOne(ctx, filter).Decode(&result)
 	if err != nil {
 		log.WithError(err).Warn("Error finding dtr")
 		return nil, nil
@@ -58,7 +58,7 @@ func GetDTR(client *mongo.Client) (*time.Time, *time.Time) {
 	return result.In, result.Out
 }
 
-func IsHoliday(client *mongo.Client) (string, bool) {
+func IsHoliday(ctx context.Context, client *mongo.Client) (string, bool) {
 	collection := client.Database(databaseName).Collection(holidayCollectionName)
 
 	date := Now().Format("2006-01-02")
@@ -71,7 +71,7 @@ func IsHoliday(client *mongo.Client) (string, bool) {
 		Name string
 	}{}
 
-	err := collection.FindOne(context.Background(), filter).Decode(&result)
+	err := collection.FindOne(ctx, filter).Decode(&result)
 	if err != nil {
 		log.WithError(err).Warn("Error finding holiday")
 		return "", false

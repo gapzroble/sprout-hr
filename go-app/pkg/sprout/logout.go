@@ -54,7 +54,7 @@ func logout(token string) (string, error) {
 	return res.Message, nil
 }
 
-func Logout(client *mongo.Client, timeIn *time.Time, token string) (string, error) {
+func Logout(ctx context.Context, client *mongo.Client, timeIn *time.Time, token string) (string, error) {
 	message, err := logout(token)
 	if err != nil {
 		return "Logout failed", err
@@ -70,7 +70,7 @@ func Logout(client *mongo.Client, timeIn *time.Time, token string) (string, erro
 
 	collection := client.Database(databaseName).Collection(collectionName)
 
-	_, err = collection.InsertOne(context.Background(), dtr)
+	_, err = collection.InsertOne(ctx, dtr)
 	if err != nil {
 		return "Save dtr faield", err
 	}

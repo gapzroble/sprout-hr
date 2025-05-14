@@ -14,25 +14,25 @@ var (
 )
 
 // ConnectMongoDb take mongodb url and related to connections
-func ConnectMongoDb(url string) error {
+func ConnectMongoDb(ctx context.Context, url string) error {
 	log.WithField("url", url).Println("Connecting to mongodb")
 
 	var err error
 
 	clientOptions := options.Client().ApplyURI(url)
 
-	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	cctx, cancel := context.WithTimeout(ctx, 3*time.Second)
 	defer cancel()
 
 	// Connect to MongoDB
-	client, err = mongo.Connect(ctx, clientOptions)
+	client, err = mongo.Connect(cctx, clientOptions)
 	if err != nil {
 		log.WithError(err).Error("Error connecting to mongodb")
 		return err
 	}
 
 	// Check the connection
-	if err = client.Ping(ctx, nil); err != nil {
+	if err = client.Ping(cctx, nil); err != nil {
 		log.WithError(err).Error("Error pinging mongodb")
 		return err
 	}
@@ -42,11 +42,11 @@ func ConnectMongoDb(url string) error {
 	return nil
 }
 
-func DisconnectMongoDb() {
+func DisconnectMongoDb(ctx context.Context) {
 	if client != nil {
 		log.Println("Disconnecting mongodb")
-		if err := client.Disconnect(context.TODO()); err == nil {
-			log.Println("MongoClient connected")
+		if err := client.Disconnect(ctx); err == nil {
+			log.Println("MongoClient disconnected")
 		}
 	}
 }

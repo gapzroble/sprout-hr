@@ -9,13 +9,15 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-func Login(w http.ResponseWriter, r *http.Request) {
+func Logout(w http.ResponseWriter, r *http.Request) {
 	defer handlePanic()
 
-	if !sprout.CanLogin() {
-		w.Write([]byte("Cannot login yet"))
+	if !sprout.CanLogout() {
+		w.Write([]byte("Cannot logout yet"))
 		return
 	}
+
+	ctx := r.Context()
 
 	var wg sync.WaitGroup
 
@@ -31,28 +33,32 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	}()
 
 	var timeIn *time.Time
+	var timeOut *time.Time
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		timeIn, _ = sprout.GetDTR(client)
+		timeIn, timeOut = sprout.GetDTR(ctx, client)
 	}()
 
 	wg.Wait()
 
-	if timeIn != nil {
-		w.Write([]byte("Already logged in"))
+	if timeOut != nil {
+		w.Write([]byte("Already logged out"))
 		return
 	}
 
-	log.Println("Logging in..")
-
-	message, err := sprout.Login(client, token)
-	if err != nil {
-		log.WithError(err).Error("Failed to login")
-		w.Write([]byte(err.Error()))
+	if timeIn == nil {
+		w.Write([]byte("Not logged in"))
 		return
+	}
+
+	log.Println("Logging out..")
+
+	message, err := sprout.Logout(ctx, client, timeIn, token)
+	if err != nil {
+		log.WithError(err).Error("Failed to logout")
+		w.Write([]byte(err.Error()))
 	}
 
 	w.Write([]byte(message))
-
 }
