@@ -1,7 +1,7 @@
 package sprout
 
 import (
-	"log"
+	log "github.com/sirupsen/logrus"
 )
 
 // after 8am

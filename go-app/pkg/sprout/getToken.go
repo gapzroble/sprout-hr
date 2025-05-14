@@ -4,9 +4,10 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"strings"
+
+	log "github.com/sirupsen/logrus"
 )
 
 const (
@@ -19,24 +20,22 @@ func GetRequestVerificationToken() (string, error) {
 
 	response, err := http.Get(endpoint)
 	if err != nil {
-		log.Println("Failed to get token", err)
+		log.WithError(err).Error("Failed to get token")
 		return "", err
 	}
 
 	responseBody, err := io.ReadAll(response.Body)
 	if err != nil {
-		log.Println("Failed to read response", err)
+		log.WithError(err).Error("Failed to read response")
 		return "", err
 	}
 
 	if response.StatusCode > 299 {
-		log.Println("Request failed",
-			map[string]interface{}{
-				"StatusCode":       response.StatusCode,
-				"Response Headers": response.Header,
-				"Response Body":    string(responseBody),
-			},
-		)
+		log.WithFields(log.Fields{
+			"StatusCode":       response.StatusCode,
+			"Response Headers": response.Header,
+			"Response Body":    string(responseBody),
+		}).Error("Request failed")
 		return "", fmt.Errorf("expecting 2xx response, got %d", response.StatusCode)
 	}
 

@@ -1,12 +1,12 @@
 package handler
 
 import (
-	"log"
 	"net/http"
 	"sync"
 	"time"
 
 	"github.com/gapzroble/sprout-hr/pkg/sprout"
+	log "github.com/sirupsen/logrus"
 )
 
 func Login(w http.ResponseWriter, r *http.Request) {
@@ -26,7 +26,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		var err error
 		token, err = sprout.GetRequestVerificationToken()
 		if err != nil {
-			log.Println("Failed to get request verification token", err)
+			log.WithError(err).Error("Failed to get request verification token")
 		}
 	}()
 
@@ -48,7 +48,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 
 	message, err := sprout.Login(client, token)
 	if err != nil {
-		log.Println("Failed to login", err)
+		log.WithError(err).Error("Failed to login")
 		w.Write([]byte(err.Error()))
 		return
 	}

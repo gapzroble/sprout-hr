@@ -4,11 +4,12 @@ import (
 	"context"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"net/url"
 	"os"
 	"strings"
+
+	log "github.com/sirupsen/logrus"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -34,7 +35,7 @@ func login(token string) (string, error) {
 	}
 
 	responseBody, _ := io.ReadAll(response.Body)
-	log.Println("Response", responseBody)
+	log.Debug("Response", responseBody)
 
 	if response.StatusCode > 299 {
 		return fmt.Sprintf("%d error", response.StatusCode), fmt.Errorf("expecting 2xx response , got %d", response.StatusCode)

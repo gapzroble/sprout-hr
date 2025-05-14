@@ -1,8 +1,9 @@
 package sprout
 
 import (
-	"log"
 	"time"
+
+	log "github.com/sirupsen/logrus"
 
 	_ "time/tzdata"
 )
@@ -17,7 +18,7 @@ func init() {
 	pht, err = time.LoadLocation("Asia/Manila")
 	if err != nil {
 		pht = time.Local
-		log.Println("Failed to load timezone", err)
+		log.WithError(err).Warn("Failed to load timezone")
 	}
 }
 

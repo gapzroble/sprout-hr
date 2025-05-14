@@ -1,12 +1,12 @@
 package handler
 
 import (
-	"log"
 	"net/http"
 	"sync"
 	"time"
 
 	"github.com/gapzroble/sprout-hr/pkg/sprout"
+	log "github.com/sirupsen/logrus"
 )
 
 func Logout(w http.ResponseWriter, r *http.Request) {
@@ -27,7 +27,7 @@ func Logout(w http.ResponseWriter, r *http.Request) {
 		var err error
 		token, err = sprout.GetRequestVerificationToken()
 		if err != nil {
-			log.Println("Failed to get request verification token", err)
+			log.WithError(err).Error("Failed to get request verification token")
 		}
 	}()
 
@@ -55,7 +55,7 @@ func Logout(w http.ResponseWriter, r *http.Request) {
 
 	message, err := sprout.Logout(client, timeIn, token)
 	if err != nil {
-		log.Println("Failed to logout", err)
+		log.WithError(err).Error("Failed to logout")
 		w.Write([]byte(err.Error()))
 	}
 

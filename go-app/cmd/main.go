@@ -3,12 +3,12 @@ package main
 import (
 	"crypto/sha256"
 	"fmt"
-	"log"
 	"net/http"
 	"os"
 	"time"
 
 	"github.com/gapzroble/sprout-hr/pkg/handler"
+	log "github.com/sirupsen/logrus"
 )
 
 var (
@@ -16,11 +16,13 @@ var (
 )
 
 func init() {
+	log.SetFormatter(&log.TextFormatter{FullTimestamp: true})
+
 	apikey = os.Getenv("APIKEY")
 	if apikey == "" {
 		apikey = time.Now().String()
 	}
-	log.Println("apikey", apikey)
+	log.WithField("value", apikey).Println("apikey")
 
 	h := sha256.New()
 	h.Write([]byte(apikey))
@@ -43,10 +45,12 @@ func main() {
 
 func authorized(next http.HandlerFunc) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		log.Printf("Request start: %s ---------------------------\n", r.URL.Path)
-		defer log.Printf("Request end: %s -----------------------------\n", r.URL.Path)
+		log.Println("---------------------------------------------------------------------------------")
+		log.Printf("Request start: %s\n", r.URL.Path)
+		defer log.Printf("Request end: %s\n", r.URL.Path)
 
 		if r.URL.Query().Get("apikey") != apikey {
+			log.Warn("Wrong/no apikey")
 			response := "404 page not found"
 			w.WriteHeader(404)
 			w.Write([]byte(response))

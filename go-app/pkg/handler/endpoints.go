@@ -2,10 +2,10 @@ package handler
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 
 	"github.com/gapzroble/sprout-hr/pkg/sprout"
+	log "github.com/sirupsen/logrus"
 )
 
 func Endpoints(w http.ResponseWriter, r *http.Request) {
@@ -76,6 +76,6 @@ func handlePanic() {
 			message = "Unknown error type"
 		}
 
-		log.Println(message)
+		log.Error(message)
 	}
 }

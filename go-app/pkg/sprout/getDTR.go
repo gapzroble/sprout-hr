@@ -2,8 +2,9 @@ package sprout
 
 import (
 	"context"
-	"log"
 	"time"
+
+	log "github.com/sirupsen/logrus"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -34,7 +35,7 @@ func GetDTR(client *mongo.Client) (*time.Time, *time.Time) {
 
 	err := collection.FindOne(context.Background(), filter).Decode(&result)
 	if err != nil {
-		log.Println("Error finding dtr", err)
+		log.WithError(err).Warn("Error finding dtr")
 		return nil, nil
 	}
 
@@ -48,7 +49,7 @@ func GetDTR(client *mongo.Client) (*time.Time, *time.Time) {
 		result.Out = &out
 	}
 
-	log.Println("DTR result", result)
+	log.Printf("DTR result (in: %v, out: %v)", result.In, result.Out)
 
 	return result.In, result.Out
 }

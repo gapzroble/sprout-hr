@@ -2,9 +2,9 @@ package handler
 
 import (
 	"context"
-	"log"
 	"time"
 
+	log "github.com/sirupsen/logrus"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -15,7 +15,7 @@ var (
 
 // ConnectMongoDb take mongodb url and related to connections
 func ConnectMongoDb(url string) error {
-	log.Println("Connecting to mongodb", url)
+	log.WithField("url", url).Println("Connecting to mongodb")
 
 	var err error
 
@@ -27,13 +27,13 @@ func ConnectMongoDb(url string) error {
 	// Connect to MongoDB
 	client, err = mongo.Connect(ctx, clientOptions)
 	if err != nil {
-		log.Println("Error connecting to mongodb", err)
+		log.WithError(err).Error("Error connecting to mongodb")
 		return err
 	}
 
 	// Check the connection
 	if err = client.Ping(ctx, nil); err != nil {
-		log.Println("Error pinging mongodb", err)
+		log.WithError(err).Error("Error pinging mongodb")
 		return err
 	}
 
