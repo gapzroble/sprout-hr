@@ -50,8 +50,12 @@ func authorized(next http.HandlerFunc) http.HandlerFunc {
 		log.WithField("path", r.URL.Path).Println("Request START:")
 		defer log.Println("Request END")
 
-		if r.Header.Get("X-API-KEY") != apikey {
-			log.Warn("Wrong/no apikey")
+		header := r.Header.Get("X-API-KEY")
+		if header != apikey {
+			for key, value := range r.Header {
+				log.WithField(key, value).Println("header")
+			}
+			log.WithField("value", header).Warn("Wrong/no apikey")
 			response := "404 page not found"
 			w.WriteHeader(404)
 			w.Write([]byte(response))
