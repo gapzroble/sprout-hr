@@ -19,8 +19,8 @@ import (
 func logout(token string) (string, error) {
 	data := url.Values{}
 	data.Set("typeClock", "ClockOut")
-	data.Set("Username", os.Getenv("username"))
-	data.Set("Password", os.Getenv("password"))
+	data.Set("Username", os.Getenv("USERNAME"))
+	data.Set("Password", os.Getenv("PASSWORD"))
 	data.Set("__RequestVerificationToken", token)
 	data.Set("X-Requested-With", "XMLHttpRequest")
 
@@ -36,7 +36,7 @@ func logout(token string) (string, error) {
 	}
 
 	responseBody, _ := io.ReadAll(response.Body)
-	log.Debug("Response", responseBody)
+	log.WithField("body", string(responseBody)).Debug("Response")
 
 	if response.StatusCode > 299 {
 		return fmt.Sprintf("%d error", response.StatusCode), fmt.Errorf("expecting 2xx response , got %d", response.StatusCode)
