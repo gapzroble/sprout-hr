@@ -9,10 +9,10 @@ import (
 	"os"
 	"strings"
 
+	"github.com/gapzroble/sprout-hr/pkg/mongodb"
 	log "github.com/sirupsen/logrus"
 
 	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
@@ -54,7 +54,7 @@ func logout(token string) (string, error) {
 	return res.Message, nil
 }
 
-func Logout(ctx context.Context, client *mongo.Client, dtr *DTR, token string) (string, error) {
+func Logout(ctx context.Context, dtr DTR, token string) (string, error) {
 	message, err := logout(token)
 	if err != nil {
 		return "Logout failed", err
@@ -62,7 +62,7 @@ func Logout(ctx context.Context, client *mongo.Client, dtr *DTR, token string) (
 
 	log.Println("Saving DTR..")
 
-	collection := client.Database(databaseName).Collection(collectionName)
+	collection := mongodb.Collection(databaseName, collectionName)
 
 	opts := options.Update().SetUpsert(true)
 	filter := bson.D{bson.E{Key: "_id", Value: dtr.ID}}

@@ -36,7 +36,7 @@ func Logout(w http.ResponseWriter, r *http.Request) {
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		dtr = sprout.GetDTR(ctx, client)
+		dtr = sprout.GetDTR(ctx)
 		if dtr == nil {
 			dtr = &sprout.DTR{} // zero value
 		}
@@ -56,7 +56,7 @@ func Logout(w http.ResponseWriter, r *http.Request) {
 
 	log.Println("Logging out..")
 
-	message, err := sprout.Logout(ctx, client, dtr, token)
+	message, err := sprout.Logout(ctx, *dtr, token)
 	if err != nil {
 		log.WithError(err).Error("Failed to logout")
 		w.Write([]byte(err.Error()))

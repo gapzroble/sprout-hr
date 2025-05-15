@@ -4,11 +4,11 @@ import (
 	"context"
 	"time"
 
+	"github.com/gapzroble/sprout-hr/pkg/mongodb"
 	log "github.com/sirupsen/logrus"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
-	"go.mongodb.org/mongo-driver/mongo"
 )
 
 type DTR struct {
@@ -40,10 +40,10 @@ var (
 	holidayCollectionName = "holidays"
 )
 
-func GetDTR(ctx context.Context, client *mongo.Client) *DTR {
+func GetDTR(ctx context.Context) *DTR {
 	var result DTR
 
-	collection := client.Database(databaseName).Collection(collectionName)
+	collection := mongodb.Collection(databaseName, collectionName)
 
 	date := Now().Format("2006-01-02")
 	filter := bson.D{bson.E{Key: "date", Value: date}}
@@ -66,8 +66,8 @@ func GetDTR(ctx context.Context, client *mongo.Client) *DTR {
 	return &dtr
 }
 
-func IsHoliday(ctx context.Context, client *mongo.Client) (string, bool) {
-	collection := client.Database(databaseName).Collection(holidayCollectionName)
+func IsHoliday(ctx context.Context) (string, bool) {
+	collection := mongodb.Collection(databaseName, holidayCollectionName)
 
 	date := Now().Format("2006-01-02")
 	filter := bson.D{bson.E{Key: "date", Value: date}}

@@ -9,7 +9,8 @@ import (
 	"time"
 
 	"github.com/gapzroble/sprout-hr/pkg/handler"
-	_ "github.com/gapzroble/sprout-hr/pkg/sprout"
+	"github.com/gapzroble/sprout-hr/pkg/mongodb"
+	_ "github.com/gapzroble/sprout-hr/pkg/sprout" // init timezone
 	log "github.com/sirupsen/logrus"
 )
 
@@ -35,14 +36,22 @@ func init() {
 func main() {
 	ctx := context.Background()
 
-	if err := handler.ConnectMongoDb(ctx, os.Getenv("MONGODB_URL")); err != nil {
+	if err := mongodb.Connect(ctx, os.Getenv("MONGODB_URL")); err != nil {
 		log.Panicln("Failed to connect to mongodb", err)
 		return
 	}
-	defer handler.DisconnectMongoDb(ctx)
+	defer mongodb.Disconnect(ctx)
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(404)
+	})
+	http.HandleFunc("/healthcheck", func(w http.ResponseWriter, r *http.Request) {
+		if err := mongodb.Ping(ctx); err != nil {
+			log.WithError(err).Error("Error pinging mongodb")
+			w.Write(fmt.Appendf([]byte{}, "Ping error: %s", err))
+		} else {
+			w.Write([]byte("OK"))
+		}
 	})
 	http.HandleFunc("/endpoints", authorized(ctx, handler.Endpoints))
 	http.HandleFunc("/login", authorized(ctx, handler.Login))
@@ -64,7 +73,6 @@ func authorized(ctx context.Context, next http.HandlerFunc) http.HandlerFunc {
 			}
 			log.WithField("value", header).Warn("Wrong/no apikey")
 			w.WriteHeader(404)
-			// w.Write([]byte("404 page not found"))
 			return
 		}
 

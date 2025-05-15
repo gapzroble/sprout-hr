@@ -5,7 +5,7 @@ import (
 
 	log "github.com/sirupsen/logrus"
 
-	_ "time/tzdata"
+	_ "time/tzdata" // load timezones
 )
 
 var (

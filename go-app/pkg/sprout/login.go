@@ -9,10 +9,10 @@ import (
 	"os"
 	"strings"
 
+	"github.com/gapzroble/sprout-hr/pkg/mongodb"
 	log "github.com/sirupsen/logrus"
 
 	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/mongo"
 )
 
 func login(token string) (string, error) {
@@ -53,7 +53,7 @@ func login(token string) (string, error) {
 	return res.Message, nil
 }
 
-func Login(ctx context.Context, client *mongo.Client, token string) (string, error) {
+func Login(ctx context.Context, token string) (string, error) {
 	message, err := login(token)
 	if err != nil {
 		return "Login failed", err
@@ -68,7 +68,7 @@ func Login(ctx context.Context, client *mongo.Client, token string) (string, err
 		"login": message,
 	}
 
-	collection := client.Database(databaseName).Collection(collectionName)
+	collection := mongodb.Collection(databaseName, collectionName)
 
 	result, err := collection.InsertOne(ctx, dtr)
 	if err != nil {

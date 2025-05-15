@@ -36,7 +36,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		if dtr := sprout.GetDTR(ctx, client); dtr != nil {
+		if dtr := sprout.GetDTR(ctx); dtr != nil {
 			timeIn = dtr.In
 		}
 	}()
@@ -50,7 +50,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 
 	log.Println("Logging in..")
 
-	message, err := sprout.Login(ctx, client, token)
+	message, err := sprout.Login(ctx, token)
 	if err != nil {
 		log.WithError(err).Error("Failed to login")
 		w.Write([]byte(err.Error()))

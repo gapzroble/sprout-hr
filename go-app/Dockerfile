@@ -8,4 +8,4 @@ RUN make build
 
 EXPOSE 3000
 
-CMD [ "/go-app" ]
+CMD [ "./go-app" ]

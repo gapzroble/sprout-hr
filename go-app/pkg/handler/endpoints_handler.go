@@ -26,7 +26,7 @@ func getLink(ctx context.Context) (link *Link) {
 		return
 	}
 
-	if name, yes := sprout.IsHoliday(ctx, client); yes {
+	if name, yes := sprout.IsHoliday(ctx); yes {
 		holiday := "Rest Day (Holiday)"
 		if name != "" {
 			holiday = name
@@ -40,7 +40,7 @@ func getLink(ctx context.Context) (link *Link) {
 		return
 	}
 
-	dtr := sprout.GetDTR(ctx, client)
+	dtr := sprout.GetDTR(ctx)
 	if dtr == nil {
 		link.AddChild(NewLink("login", "Login", "/login"))
 		link.AddChild(NewLink("no_logout", "Logout"))
