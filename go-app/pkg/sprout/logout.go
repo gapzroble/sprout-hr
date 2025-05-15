@@ -66,7 +66,10 @@ func Logout(ctx context.Context, client *mongo.Client, dtr *DTR, token string) (
 
 	opts := options.Update().SetUpsert(true)
 	filter := bson.D{bson.E{Key: "_id", Value: dtr.ID}}
-	update := bson.D{bson.E{Key: "$set", Value: bson.D{bson.E{Key: "out", Value: Now()}}}}
+	update := bson.D{bson.E{Key: "$set", Value: bson.D{
+		bson.E{Key: "out", Value: Now()},
+		bson.E{Key: "logout", Value: message},
+	}}}
 
 	result, err := collection.UpdateOne(ctx, filter, update, opts)
 	if err != nil {

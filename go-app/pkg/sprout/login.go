@@ -63,8 +63,9 @@ func Login(ctx context.Context, client *mongo.Client, token string) (string, err
 
 	now := Now()
 	dtr := bson.M{
-		"date": now.Format("2006-01-02"),
-		"in":   &now,
+		"date":  now.Format("2006-01-02"),
+		"in":    &now,
+		"login": message,
 	}
 
 	collection := client.Database(databaseName).Collection(collectionName)
