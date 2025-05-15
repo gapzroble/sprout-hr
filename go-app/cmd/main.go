@@ -60,9 +60,8 @@ func authorized(ctx context.Context, next http.HandlerFunc) http.HandlerFunc {
 				log.WithField(key, value).Println("header")
 			}
 			log.WithField("value", header).Warn("Wrong/no apikey")
-			response := "404 page not found"
 			w.WriteHeader(404)
-			w.Write([]byte(response))
+			// w.Write([]byte("404 page not found"))
 			return
 		}
 
