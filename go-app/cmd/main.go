@@ -41,6 +41,9 @@ func main() {
 	}
 	defer handler.DisconnectMongoDb(ctx)
 
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(404)
+	})
 	http.HandleFunc("/endpoints", authorized(ctx, handler.Endpoints))
 	http.HandleFunc("/login", authorized(ctx, handler.Login))
 	http.HandleFunc("/logout", authorized(ctx, handler.Logout))
