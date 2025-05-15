@@ -45,6 +45,10 @@ networks:
     driver: bridge
 
 x-casaos:
+  hostname: 192.168.10.106
+  index: /health-check
+  port_map: "8080"
+  scheme: http
   icon: https://stsprshared.blob.core.windows.net/spr-sea-image-test/sprout-logo-card.svg
   title:
     en_US: Sprout HR
