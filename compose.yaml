@@ -43,3 +43,8 @@ services:
 networks: 
   go-network:
     driver: bridge
+
+x-casaos:
+  icon: https://stsprshared.blob.core.windows.net/spr-sea-image-test/sprout-logo-card.svg
+  title:
+    en_US: Sprout HR
