@@ -45,7 +45,7 @@ func main() {
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(404)
 	})
-	http.HandleFunc("/healthcheck", func(w http.ResponseWriter, r *http.Request) {
+	http.HandleFunc("/health-check", func(w http.ResponseWriter, r *http.Request) {
 		if err := mongodb.Ping(ctx); err != nil {
 			log.WithError(err).Error("Error pinging mongodb")
 			w.Write(fmt.Appendf([]byte{}, "Ping error: %s", err))
